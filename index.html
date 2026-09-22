@@ -144,6 +144,10 @@
     .action:disabled { cursor: not-allowed; opacity: .42; }
     .kbd { color: var(--muted); font-size: .72rem; }
 
+    .site-footer { margin-top: 22px; text-align: center; font-size: .78rem; }
+    .site-footer a { color: var(--muted); text-decoration: none; }
+    .site-footer a:hover, .site-footer a:focus-visible { color: var(--accent); text-decoration: underline; }
+
     @media (max-width: 660px) {
       .app { width: min(100% - 20px, 900px); padding-top: 20px; }
       header { align-items: start; }
@@ -200,6 +204,10 @@
       <button id="reset" class="action" type="button">リセット</button>
       <button id="next" class="action primary" type="button" disabled>次の問題 <span class="kbd">(N)</span></button>
     </div>
+
+    <footer class="site-footer">
+      <a href="https://github.com/budoucha/brahmic-script-quiz" target="_blank" rel="noopener noreferrer">GitHub リポジトリ</a>
+    </footer>
   </main>
 
   <script>

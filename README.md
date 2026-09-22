@@ -2,6 +2,8 @@
 
 短文の字面から、使われているブラーフミー系文字を当てるブラウザクイズ。
 
+**公開版:** https://budoucha.github.io/brahmic-script-quiz/
+
 ## 収録文字
 
 - デーヴァナーガリー、ベンガル文字、グルムキー文字、グジャラート文字、オディア文字
@@ -19,4 +21,4 @@
 
 ## GitHub Pages
 
-リポジトリの **Settings → Pages** で、**Deploy from a branch**、ブランチ **main / (root)** を選ぶと公開できる。
+https://budoucha.github.io/brahmic-script-quiz/ で公開中。
