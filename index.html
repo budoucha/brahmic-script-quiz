@@ -130,6 +130,7 @@
       gap: 12px;
       margin-top: 16px;
     }
+    .comparison[hidden] { display: none; }
 
     .compare-card { padding: 15px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel-2); }
     .compare-card.correct-side { border-color: var(--good); }
@@ -359,9 +360,8 @@
         els.verdict.className = `verdict ${isCorrect ? 'good' : 'bad'}`;
         els.detail.textContent = `${current.language}の例文。判別ポイント：${current.hint}`;
 
-        if (isCorrect) {
-          els.comparison.hidden = true;
-        } else {
+        els.comparison.hidden = isCorrect;
+        if (!isCorrect) {
           els.wrongLabel.textContent = selected.script;
           els.wrongSample.textContent = pickText(selected);
           els.wrongMeta.textContent = `${selected.language}。判別ポイント：${selected.hint}`;
