@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="17種類のブラーフミー系文字を短文から見分けるクイズ">
+  <meta name="theme-color" content="#18212f">
+  <title>ブラーフミー系文字 判別クイズ</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0d121a;
+      --panel: #151d29;
+      --panel-2: #1b2635;
+      --line: #304056;
+      --text: #edf2f7;
+      --muted: #aeb9c8;
+      --accent: #67d5c4;
+      --accent-2: #17483f;
+      --good: #7ce0a4;
+      --good-bg: #173b2b;
+      --bad: #ff9c9c;
+      --bad-bg: #4a2025;
+      font-family: Inter, "Noto Sans JP", "Noto Sans", system-ui, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 20% -10%, #1e3d50 0, transparent 35rem),
+        var(--bg);
+      color: var(--text);
+    }
+
+    button { font: inherit; }
+
+    .app {
+      width: min(900px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 34px 0 50px;
+    }
+
+    header {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    h1 { margin: 0; font-size: clamp(1.45rem, 4vw, 2.15rem); }
+    .sub { margin: 6px 0 0; color: var(--muted); font-size: .92rem; }
+
+    .score {
+      flex: 0 0 auto;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      background: rgba(21, 29, 41, .8);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .score strong { color: var(--text); }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(21, 29, 41, .94);
+      box-shadow: 0 18px 50px rgba(0, 0, 0, .22);
+    }
+
+    .question { padding: clamp(18px, 4vw, 32px); }
+    .question-meta { color: var(--muted); font-size: .87rem; }
+
+    .sample {
+      display: grid;
+      min-height: 180px;
+      place-items: center;
+      margin-top: 13px;
+      padding: 26px 18px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel-2);
+      text-align: center;
+      font-family: "Noto Sans", "Nirmala UI", "Leelawadee UI", sans-serif;
+      font-size: clamp(1.75rem, 5vw, 3rem);
+      line-height: 1.55;
+      overflow-wrap: anywhere;
+    }
+
+    .instruction { margin: 12px 0 0; text-align: center; color: var(--muted); font-size: .8rem; }
+
+    .answers {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin: 14px 0;
+    }
+
+    .answer, .action {
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      color: var(--text);
+      background: var(--panel);
+      cursor: pointer;
+      transition: transform .12s ease, border-color .12s ease, background .12s ease;
+    }
+
+    .answer { min-height: 54px; padding: 9px 12px; }
+    .answer:hover:not(:disabled), .action:hover:not(:disabled) { transform: translateY(-1px); border-color: var(--accent); }
+    .answer:focus-visible, .action:focus-visible { outline: 3px solid color-mix(in srgb, var(--accent) 48%, transparent); outline-offset: 2px; }
+    .answer:disabled { cursor: default; opacity: .62; }
+    .answer.correct { border-color: var(--good); background: var(--good-bg); color: var(--good); opacity: 1; }
+    .answer.wrong { border-color: var(--bad); background: var(--bad-bg); color: var(--bad); opacity: 1; }
+
+    .result { padding: 20px; }
+    .result[hidden] { display: none; }
+    .verdict { margin: 0; font-size: 1.16rem; }
+    .verdict.good { color: var(--good); }
+    .verdict.bad { color: var(--bad); }
+    .detail { margin: 7px 0 0; color: var(--muted); line-height: 1.65; }
+
+    .comparison {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .compare-card { padding: 15px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel-2); }
+    .compare-card.correct-side { border-color: var(--good); }
+    .compare-role { color: var(--muted); font-size: .76rem; }
+    .compare-label { margin-top: 4px; font-weight: 700; }
+    .compare-text { margin-top: 12px; min-height: 4.5em; font-size: clamp(1.25rem, 3vw, 1.7rem); line-height: 1.5; overflow-wrap: anywhere; }
+    .compare-meta { margin-top: 10px; color: var(--muted); font-size: .78rem; line-height: 1.5; }
+
+    .controls { display: flex; justify-content: space-between; gap: 10px; margin-top: 14px; }
+    .action { min-height: 46px; padding: 9px 17px; }
+    .action.primary { margin-left: auto; border-color: var(--accent); background: var(--accent-2); }
+    .action:disabled { cursor: not-allowed; opacity: .42; }
+    .kbd { color: var(--muted); font-size: .72rem; }
+
+    @media (max-width: 660px) {
+      .app { width: min(100% - 20px, 900px); padding-top: 20px; }
+      header { align-items: start; }
+      .score { font-size: .82rem; }
+      .answers { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .comparison { grid-template-columns: 1fr; }
+      .sample { min-height: 145px; }
+      .kbd { display: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { scroll-behavior: auto !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header>
+      <div>
+        <h1>ブラーフミー系文字 判別クイズ</h1>
+        <p class="sub">短文の字面だけを見て、文字体系を当てる</p>
+      </div>
+      <div class="score"><strong id="score">0</strong> 正解 / <span id="answered">0</span> 問</div>
+    </header>
+
+    <section class="card question" aria-labelledby="progress">
+      <div id="progress" class="question-meta">第 1 問</div>
+      <div id="sample" class="sample" lang="und"></div>
+      <p class="instruction">言語名ではなく、使われている文字体系を選択</p>
+    </section>
+
+    <div id="answers" class="answers" role="group" aria-label="回答候補"></div>
+
+    <section id="result" class="card result" aria-live="polite" hidden>
+      <h2 id="verdict" class="verdict"></h2>
+      <p id="detail" class="detail"></p>
+      <div id="comparison" class="comparison" hidden>
+        <article class="compare-card">
+          <div class="compare-role">選んだ文字の例</div>
+          <div id="wrong-label" class="compare-label"></div>
+          <div id="wrong-sample" class="compare-text"></div>
+          <div id="wrong-meta" class="compare-meta"></div>
+        </article>
+        <article class="compare-card correct-side">
+          <div class="compare-role">正解の文字</div>
+          <div id="correct-label" class="compare-label"></div>
+          <div id="correct-sample" class="compare-text"></div>
+          <div id="correct-meta" class="compare-meta"></div>
+        </article>
+      </div>
+    </section>
+
+    <div class="controls">
+      <button id="reset" class="action" type="button">リセット</button>
+      <button id="next" class="action primary" type="button" disabled>次の問題 <span class="kbd">(N)</span></button>
+    </div>
+  </main>
+
+  <script>
+    (() => {
+      'use strict';
+
+      const data = [
+        { script: 'デーヴァナーガリー', language: 'ヒンディー語', hint: '上部を横線でつないだ「屋根」が非常に目立つ。', texts: [
+          'आज मौसम अच्छा है।', 'मैं एक किताब पढ़ रहा हूँ।', 'यह शहर बहुत बड़ा है।', 'पानी बहुत ठंडा है।', 'हम कल बाजार जाएंगे।'
+        ]},
+        { script: 'ベンガル文字', language: 'ベンガル語', hint: '上線を持つが、デーヴァナーガリーより丸く、垂れ下がる形が多い。', texts: [
+          'আজ আবহাওয়া ভালো।', 'আমি একটি বই পড়ছি।', 'এই শহরটি খুব বড়।', 'পানি খুব ঠান্ডা।', 'আমরা কাল বাজারে যাব।'
+        ]},
+        { script: 'グルムキー文字', language: 'パンジャーブ語', hint: '上線があり、比較的直線的で簡潔な字形が多い。', texts: [
+          'ਅੱਜ ਮੌਸਮ ਚੰਗਾ ਹੈ।', 'ਮੈਂ ਇੱਕ ਕਿਤਾਬ ਪੜ੍ਹ ਰਿਹਾ ਹਾਂ।', 'ਇਹ ਸ਼ਹਿਰ ਬਹੁਤ ਵੱਡਾ ਹੈ।', 'ਪਾਣੀ ਬਹੁਤ ਠੰਢਾ ਹੈ।', 'ਅਸੀਂ ਕੱਲ੍ਹ ਬਾਜ਼ਾਰ ਜਾਵਾਂਗੇ।'
+        ]},
+        { script: 'グジャラート文字', language: 'グジャラート語', hint: 'デーヴァナーガリーに近いが、上部の連続した横線がない。', texts: [
+          'આજે હવામાન સારું છે.', 'હું એક પુસ્તક વાંચું છું.', 'આ શહેર બહુ મોટું છે.', 'પાણી બહુ ઠંડું છે.', 'અમે કાલે બજારમાં જઈશું.'
+        ]},
+        { script: 'オディア文字', language: 'オディア語', hint: '円・半円が非常に多く、丸い傘のような字形が特徴。', texts: [
+          'ଆଜି ପାଗ ଭଲ ଅଛି।', 'ମୁଁ ଗୋଟିଏ ବହି ପଢ଼ୁଛି।', 'ଏହି ସହର ବହୁତ ବଡ଼।', 'ପାଣି ବହୁତ ଥଣ୍ଡା।', 'ଆମେ କାଲି ବଜାରକୁ ଯିବୁ।'
+        ]},
+        { script: 'タミル文字', language: 'タミル語', hint: '丸みが強い一方、テルグ・カンナダほど輪郭が複雑ではない。', texts: [
+          'இன்று வானிலை நன்றாக உள்ளது.', 'நான் ஒரு புத்தகம் படிக்கிறேன்.', 'இந்த நகரம் மிகவும் பெரியது.', 'தண்ணீர் மிகவும் குளிராக உள்ளது.', 'நாங்கள் நாளை சந்தைக்கு செல்வோம்.'
+        ]},
+        { script: 'テルグ文字', language: 'テルグ語', hint: '丸い字形と、上部の短い鉤やチェック状の線が頻出する。', texts: [
+          'ఈ రోజు వాతావరణం బాగుంది.', 'నేను ఒక పుస్తకం చదువుతున్నాను.', 'ఈ నగరం చాలా పెద్దది.', 'నీరు చాలా చల్లగా ఉంది.', 'మేము రేపు మార్కెట్‌కు వెళ్తాము.'
+        ]},
+        { script: 'カンナダ文字', language: 'カンナダ語', hint: 'テルグ文字と近縁。丸い本体に角張った小要素が混じる。', texts: [
+          'ಇಂದು ಹವಾಮಾನ ಚೆನ್ನಾಗಿದೆ.', 'ನಾನು ಒಂದು ಪುಸ್ತಕ ಓದುತ್ತಿದ್ದೇನೆ.', 'ಈ ನಗರ ತುಂಬಾ ದೊಡ್ಡದು.', 'ನೀರು ತುಂಬಾ ತಣ್ಣಗಿದೆ.', 'ನಾವು ನಾಳೆ ಮಾರುಕಟ್ಟೆಗೆ ಹೋಗುತ್ತೇವೆ.'
+        ]},
+        { script: 'マラヤーラム文字', language: 'マラヤーラム語', hint: '極端に丸く、連続するループや円弧が多い。', texts: [
+          'ഇന്ന് കാലാവസ്ഥ നല്ലതാണ്.', 'ഞാൻ ഒരു പുസ്തകം വായിക്കുന്നു.', 'ഈ നഗരം വളരെ വലുതാണ്.', 'വെള്ളം വളരെ തണുത്തതാണ്.', 'ഞങ്ങൾ നാളെ ചന്തയിലേക്ക് പോകും.'
+        ]},
+        { script: 'シンハラ文字', language: 'シンハラ語', hint: '丸い渦巻きや輪のような字形が多く、南インド系とも輪郭が異なる。', texts: [
+          'අද කාලගුණය හොඳයි.', 'මම පොතක් කියවනවා.', 'මේ නගරය ඉතා විශාලයි.', 'වතුර සීතලයි.', 'අපි හෙට වෙළඳපොළට යනවා.'
+        ]},
+        { script: 'タイ文字', language: 'タイ語', hint: '小さな輪を伴う字が多く、母音記号や声調記号が上下に飛び出す。', texts: [
+          'วันนี้อากาศดีมาก', 'ฉันกำลังอ่านหนังสือ', 'เมืองนี้ใหญ่มาก', 'น้ำเย็นมาก', 'พรุ่งนี้เราจะไปตลาด'
+        ]},
+        { script: 'ラオ文字', language: 'ラオ語', hint: 'タイ文字に似るが、全体にさらに丸く簡略化された印象。', texts: [
+          'ມື້ນີ້ອາກາດດີຫຼາຍ', 'ຂ້ອຍກຳລັງອ່ານປຶ້ມ', 'ເມືອງນີ້ໃຫຍ່ຫຼາຍ', 'ນ້ຳເຢັນຫຼາຍ', 'ມື້ອື່ນພວກເຮົາຈະໄປຕະຫຼາດ'
+        ]},
+        { script: 'クメール文字', language: 'クメール語', hint: '横方向に複雑で、上下の細かな突起が多く密度が高い。', texts: [
+          'ថ្ងៃនេះអាកាសធាតុល្អណាស់។', 'ខ្ញុំកំពុងអានសៀវភៅ។', 'ទីក្រុងនេះធំណាស់។', 'ទឹកត្រជាក់ណាស់។', 'ថ្ងៃស្អែកយើងនឹងទៅផ្សារ។'
+        ]},
+        { script: 'ビルマ文字', language: 'ビルマ語', hint: 'ほぼ円・半円だけで書いたような独特の丸さがある。', texts: [
+          'ဒီနေ့ ရာသီဥတု ကောင်းတယ်။', 'ကျွန်တော် စာအုပ်ဖတ်နေတယ်။', 'ဒီမြို့က အရမ်းကြီးတယ်။', 'ရေက အရမ်းအေးတယ်။', 'မနက်ဖြန် ကျွန်တော်တို့ ဈေးသွားမယ်။'
+        ]},
+        { script: 'チベット文字', language: 'チベット語', hint: '上部が水平で角張り、音節区切りの小点「་」が頻出する。', texts: [
+          'དེ་རིང་གནམ་གཤིས་བཟང་།', 'ང་དཔེ་ཆ་ཀློག་བཞིན་ཡོད།', 'གྲོང་ཁྱེར་འདི་ཧ་ཅང་ཆེ།', 'ཆུ་གྲང་མོ་རེད།', 'སང་ཉིན་ང་ཚོ་ཁྲོམ་ལ་འགྲོ་རྒྱུ་ཡིན།'
+        ]},
+        { script: 'ジャワ文字', language: 'ジャワ語', hint: '細長い曲線と、ぶら下がるような記号が連なる。', texts: [
+          'ꦲꦏꦸꦩꦕꦧꦸꦏꦸ꧉', 'ꦲꦶꦏꦶꦏꦸꦛꦒꦼꦝꦺ꧉', 'ꦧꦚꦸꦲꦶꦏꦶꦲꦢꦼꦩ꧀꧉', 'ꦢꦶꦤꦲꦶꦏꦶꦕꦼꦫꦃ꧉', 'ꦲꦺꦱꦸꦏ꧀ꦲꦏꦸꦩꦼꦚꦁꦥꦱꦂ꧉'
+        ]},
+        { script: 'バリ文字', language: 'バリ語', hint: 'ジャワ文字に似るが、より装飾的で細かな曲線が多い。', texts: [
+          'ᬑᬁ ᬲ᭄ᬯᬲ᭄ᬢᬶᬬᬲ᭄ᬢᬸ᭟', 'ᬭᬳᬚᭂᬂ ᬲᭂᬫᭂᬂ᭟', 'ᬭᬳᬚᭂᬂ ᬲᬶᬅᬂ᭟', 'ᬭᬳᬚᭂᬂ ᬲᭀᬭᬾ᭟', 'ᬭᬳᬚᭂᬂ ᬯᭂᬗᬶ᭟'
+        ]}
+      ];
+
+      const $ = (selector) => document.querySelector(selector);
+      const els = {
+        sample: $('#sample'), answers: $('#answers'), result: $('#result'), verdict: $('#verdict'),
+        detail: $('#detail'), comparison: $('#comparison'), wrongLabel: $('#wrong-label'),
+        wrongSample: $('#wrong-sample'), wrongMeta: $('#wrong-meta'), correctLabel: $('#correct-label'),
+        correctSample: $('#correct-sample'), correctMeta: $('#correct-meta'), next: $('#next'),
+        reset: $('#reset'), score: $('#score'), answered: $('#answered'), progress: $('#progress')
+      };
+
+      let score = 0;
+      let answered = 0;
+      let current = null;
+      let currentText = '';
+      let locked = false;
+      let order = [];
+      let optionButtons = [];
+      const lastText = new Map();
+
+      function shuffle(values) {
+        const copy = [...values];
+        for (let i = copy.length - 1; i > 0; i -= 1) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [copy[i], copy[j]] = [copy[j], copy[i]];
+        }
+        return copy;
+      }
+
+      function randomItem(values) {
+        return values[Math.floor(Math.random() * values.length)];
+      }
+
+      function pickText(item, avoid = '') {
+        const candidates = item.texts.filter((text) => text !== avoid);
+        return randomItem(candidates.length ? candidates : item.texts);
+      }
+
+      function refillOrder() {
+        order = shuffle(data.map((_, index) => index));
+      }
+
+      function updateStats() {
+        els.score.textContent = score;
+        els.answered.textContent = answered;
+      }
+
+      function newQuestion() {
+        if (!order.length) refillOrder();
+        current = data[order.pop()];
+        currentText = pickText(current, lastText.get(current.script));
+        lastText.set(current.script, currentText);
+        locked = false;
+
+        els.sample.textContent = currentText;
+        els.progress.textContent = `第 ${answered + 1} 問`;
+        els.result.hidden = true;
+        els.comparison.hidden = true;
+        els.next.disabled = true;
+        els.answers.replaceChildren();
+
+        const wrong = shuffle(data.filter((item) => item !== current)).slice(0, 5);
+        const options = shuffle([current, ...wrong]);
+        optionButtons = options.map((option, index) => {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'answer';
+          button.textContent = option.script;
+          button.dataset.script = option.script;
+          button.setAttribute('aria-label', `${index + 1}: ${option.script}`);
+          button.addEventListener('click', () => choose(option, button));
+          els.answers.append(button);
+          return button;
+        });
+      }
+
+      function choose(selected, selectedButton) {
+        if (locked) return;
+        locked = true;
+        answered += 1;
+        const isCorrect = selected === current;
+        if (isCorrect) score += 1;
+
+        optionButtons.forEach((button) => {
+          button.disabled = true;
+          if (button.dataset.script === current.script) button.classList.add('correct');
+        });
+        if (!isCorrect) selectedButton.classList.add('wrong');
+
+        els.verdict.textContent = isCorrect ? '正解' : `不正解 — 正解は「${current.script}」`;
+        els.verdict.className = `verdict ${isCorrect ? 'good' : 'bad'}`;
+        els.detail.textContent = `${current.language}の例文。判別ポイント：${current.hint}`;
+
+        if (isCorrect) {
+          els.comparison.hidden = true;
+        } else {
+          els.wrongLabel.textContent = selected.script;
+          els.wrongSample.textContent = pickText(selected);
+          els.wrongMeta.textContent = `${selected.language}。判別ポイント：${selected.hint}`;
+          els.correctLabel.textContent = current.script;
+          els.correctSample.textContent = currentText;
+          els.correctMeta.textContent = `${current.language}。判別ポイント：${current.hint}`;
+          els.comparison.hidden = false;
+        }
+
+        updateStats();
+        els.result.hidden = false;
+        els.next.disabled = false;
+        els.next.focus({ preventScroll: true });
+      }
+
+      function reset() {
+        score = 0;
+        answered = 0;
+        lastText.clear();
+        refillOrder();
+        updateStats();
+        newQuestion();
+      }
+
+      els.next.addEventListener('click', newQuestion);
+      els.reset.addEventListener('click', reset);
+      document.addEventListener('keydown', (event) => {
+        if (!locked && /^[1-6]$/.test(event.key)) {
+          optionButtons[Number(event.key) - 1]?.click();
+        } else if (locked && event.key.toLowerCase() === 'n') {
+          newQuestion();
+        }
+      });
+
+      reset();
+    })();
+  </script>
+</body>
+</html>
