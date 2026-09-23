@@ -82,6 +82,8 @@
 
     .score strong { color: var(--text); }
 
+    .header-actions { display: flex; align-items: center; justify-content: end; gap: 10px; flex-wrap: wrap; }
+
     .card {
       border: 1px solid var(--line);
       border-radius: 18px;
@@ -161,6 +163,17 @@
     .action:disabled { cursor: not-allowed; opacity: .42; }
     .kbd { color: var(--muted); font-size: .72rem; }
 
+    .reference { padding: clamp(18px, 4vw, 32px); }
+    .reference[hidden] { display: none; }
+    .reference h2 { margin: 0; font-size: 1.25rem; }
+    .reference-intro { margin: 7px 0 0; color: var(--muted); line-height: 1.65; }
+    .script-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 18px; }
+    .script-card { padding: 15px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel-2); }
+    .script-name { margin: 0; font-size: 1rem; }
+    .script-language { margin: 4px 0 0; color: var(--muted); font-size: .82rem; }
+    .script-sample { margin: 13px 0 0; min-height: 3em; font-family: "Noto Sans", "Nirmala UI", "Leelawadee UI", sans-serif; font-size: clamp(1.2rem, 3vw, 1.6rem); line-height: 1.5; overflow-wrap: anywhere; }
+    .script-hint { margin: 10px 0 0; color: var(--muted); font-size: .82rem; line-height: 1.55; }
+
     .site-footer { margin-top: 22px; text-align: center; font-size: .78rem; }
     .site-footer a { color: var(--muted); text-decoration: none; }
     .site-footer a:hover, .site-footer a:focus-visible { color: var(--accent); text-decoration: underline; }
@@ -171,6 +184,7 @@
       .score { font-size: .82rem; }
       .answers { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .comparison { grid-template-columns: 1fr; }
+      .script-list { grid-template-columns: 1fr; }
       .sample { min-height: 145px; }
       .kbd { display: none; }
     }
@@ -187,40 +201,51 @@
         <h1>ブラーフミー系文字 判別クイズ</h1>
         <p class="sub">短文の字面だけを見て、文字体系を当てる</p>
       </div>
-      <div class="score"><strong id="score">0</strong> 正解 / <span id="answered">0</span> 問</div>
+      <div class="header-actions">
+        <div id="score-panel" class="score"><strong id="score">0</strong> 正解 / <span id="answered">0</span> 問</div>
+        <button id="reference-toggle" class="action" type="button" aria-expanded="false" aria-controls="reference">文字体系一覧</button>
+      </div>
     </header>
 
-    <section class="card question" aria-labelledby="progress">
-      <div id="progress" class="question-meta">第 1 問</div>
-      <div id="sample" class="sample" lang="und"></div>
-      <p class="instruction">言語名ではなく、使われている文字体系を選択</p>
-    </section>
+    <div id="quiz-view">
+      <section class="card question" aria-labelledby="progress">
+        <div id="progress" class="question-meta">第 1 問</div>
+        <div id="sample" class="sample" lang="und"></div>
+        <p class="instruction">言語名ではなく、使われている文字体系を選択</p>
+      </section>
 
-    <div id="answers" class="answers" role="group" aria-label="回答候補"></div>
+      <div id="answers" class="answers" role="group" aria-label="回答候補"></div>
 
-    <section id="result" class="card result" aria-live="polite" hidden>
-      <h2 id="verdict" class="verdict"></h2>
-      <p id="detail" class="detail"></p>
-      <div id="comparison" class="comparison" hidden>
-        <article class="compare-card">
-          <div class="compare-role">選んだ文字の例</div>
-          <div id="wrong-label" class="compare-label"></div>
-          <div id="wrong-sample" class="compare-text"></div>
-          <div id="wrong-meta" class="compare-meta"></div>
-        </article>
-        <article class="compare-card correct-side">
-          <div class="compare-role">正解の文字</div>
-          <div id="correct-label" class="compare-label"></div>
-          <div id="correct-sample" class="compare-text"></div>
-          <div id="correct-meta" class="compare-meta"></div>
-        </article>
+      <section id="result" class="card result" aria-live="polite" hidden>
+        <h2 id="verdict" class="verdict"></h2>
+        <p id="detail" class="detail"></p>
+        <div id="comparison" class="comparison" hidden>
+          <article class="compare-card">
+            <div class="compare-role">選んだ文字の例</div>
+            <div id="wrong-label" class="compare-label"></div>
+            <div id="wrong-sample" class="compare-text"></div>
+            <div id="wrong-meta" class="compare-meta"></div>
+          </article>
+          <article class="compare-card correct-side">
+            <div class="compare-role">正解の文字</div>
+            <div id="correct-label" class="compare-label"></div>
+            <div id="correct-sample" class="compare-text"></div>
+            <div id="correct-meta" class="compare-meta"></div>
+          </article>
+        </div>
+      </section>
+
+      <div class="controls">
+        <button id="reset" class="action" type="button">リセット</button>
+        <button id="next" class="action primary" type="button" disabled>次の問題 <span class="kbd">(N)</span></button>
       </div>
-    </section>
-
-    <div class="controls">
-      <button id="reset" class="action" type="button">リセット</button>
-      <button id="next" class="action primary" type="button" disabled>次の問題 <span class="kbd">(N)</span></button>
     </div>
+
+    <section id="reference" class="card reference" aria-labelledby="reference-title" hidden>
+      <h2 id="reference-title">文字体系一覧</h2>
+      <p class="reference-intro">全 17 種類の見本と判別ポイントを、問題を解かずに確認できます。</p>
+      <div id="script-list" class="script-list"></div>
+    </section>
 
     <footer class="site-footer">
       <a href="https://github.com/budoucha/brahmic-script-quiz" target="_blank" rel="noopener noreferrer">GitHub</a>
@@ -291,7 +316,9 @@
         detail: $('#detail'), comparison: $('#comparison'), wrongLabel: $('#wrong-label'),
         wrongSample: $('#wrong-sample'), wrongMeta: $('#wrong-meta'), correctLabel: $('#correct-label'),
         correctSample: $('#correct-sample'), correctMeta: $('#correct-meta'), next: $('#next'),
-        reset: $('#reset'), score: $('#score'), answered: $('#answered'), progress: $('#progress')
+        reset: $('#reset'), score: $('#score'), answered: $('#answered'), progress: $('#progress'),
+        quizView: $('#quiz-view'), scorePanel: $('#score-panel'), reference: $('#reference'),
+        referenceToggle: $('#reference-toggle'), scriptList: $('#script-list')
       };
 
       let score = 0;
@@ -402,9 +429,51 @@
         newQuestion();
       }
 
+      function renderReference() {
+        const cards = data.map((item) => {
+          const card = document.createElement('article');
+          card.className = 'script-card';
+
+          const name = document.createElement('h3');
+          name.className = 'script-name';
+          name.textContent = item.script;
+
+          const language = document.createElement('p');
+          language.className = 'script-language';
+          language.textContent = `${item.language}の例`;
+
+          const sample = document.createElement('p');
+          sample.className = 'script-sample';
+          sample.lang = 'und';
+          sample.textContent = item.texts[0];
+
+          const hint = document.createElement('p');
+          hint.className = 'script-hint';
+          hint.textContent = `判別ポイント：${item.hint}`;
+
+          card.append(name, language, sample, hint);
+          return card;
+        });
+        els.scriptList.replaceChildren(...cards);
+      }
+
+      function toggleReference() {
+        const showingReference = els.reference.hidden;
+        els.reference.hidden = !showingReference;
+        els.quizView.hidden = showingReference;
+        els.scorePanel.hidden = showingReference;
+        els.referenceToggle.textContent = showingReference ? 'クイズに戻る' : '文字体系一覧';
+        els.referenceToggle.setAttribute('aria-expanded', String(showingReference));
+        if (showingReference) {
+          els.referenceToggle.focus({ preventScroll: true });
+        }
+      }
+
       els.next.addEventListener('click', newQuestion);
       els.reset.addEventListener('click', reset);
+      els.referenceToggle.addEventListener('click', toggleReference);
       document.addEventListener('keydown', (event) => {
+        if (!els.reference.hidden) return;
         if (!locked && /^[1-6]$/.test(event.key)) {
           optionButtons[Number(event.key) - 1]?.click();
         } else if (locked && event.key.toLowerCase() === 'n') {
@@ -412,6 +481,7 @@
         }
       });
 
+      renderReference();
       reset();
     })();
   </script>
