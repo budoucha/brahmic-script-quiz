@@ -141,7 +141,7 @@
     .verdict.good { color: var(--good); }
     .verdict.bad { color: var(--bad); }
     .detail { margin: 7px 0 0; color: var(--muted); line-height: 1.65; }
-    .detail-region { margin: 5px 0 0; color: var(--muted); line-height: 1.65; }
+    .detail-hint, .detail-region { margin: 5px 0 0; color: var(--muted); line-height: 1.65; }
 
     .comparison {
       display: grid;
@@ -156,8 +156,8 @@
     .compare-role { color: var(--muted); font-size: .76rem; }
     .compare-label { margin-top: 4px; font-weight: 700; }
     .compare-text { margin-top: 8px; font-size: clamp(1.25rem, 3vw, 1.7rem); line-height: 1.5; overflow-wrap: anywhere; }
-    .compare-meta { margin-top: 10px; color: var(--muted); font-size: .78rem; line-height: 1.5; }
-    .compare-region { margin-top: 7px; color: var(--muted); font-size: .78rem; line-height: 1.5; }
+    .compare-meta { margin: 10px 0 0; color: var(--muted); font-size: .78rem; line-height: 1.5; }
+    .compare-hint, .compare-region { margin: 5px 0 0; color: var(--muted); font-size: .78rem; line-height: 1.5; }
 
     .controls { display: flex; justify-content: space-between; gap: 10px; margin-top: 14px; }
     .action { min-height: 46px; padding: 9px 17px; }
@@ -222,6 +222,7 @@
       <section id="result" class="card result" aria-live="polite" hidden>
         <h2 id="verdict" class="verdict"></h2>
         <p id="detail" class="detail"></p>
+        <p id="detail-hint" class="detail-hint"></p>
         <p id="detail-region" class="detail-region"></p>
         <div id="comparison" class="comparison" hidden>
           <article class="compare-card">
@@ -229,6 +230,7 @@
             <div id="wrong-label" class="compare-label"></div>
             <div id="wrong-sample" class="compare-text"></div>
             <p id="wrong-meta" class="compare-meta"></p>
+            <p id="wrong-hint" class="compare-hint"></p>
             <p id="wrong-region" class="compare-region"></p>
           </article>
           <article class="compare-card correct-side">
@@ -236,6 +238,7 @@
             <div id="correct-label" class="compare-label"></div>
             <div id="correct-sample" class="compare-text"></div>
             <p id="correct-meta" class="compare-meta"></p>
+            <p id="correct-hint" class="compare-hint"></p>
             <p id="correct-region" class="compare-region"></p>
           </article>
         </div>
@@ -319,9 +322,9 @@
       const $ = (selector) => document.querySelector(selector);
       const els = {
         sample: $('#sample'), answers: $('#answers'), result: $('#result'), verdict: $('#verdict'),
-        detail: $('#detail'), detailRegion: $('#detail-region'), comparison: $('#comparison'), wrongLabel: $('#wrong-label'),
-        wrongSample: $('#wrong-sample'), wrongMeta: $('#wrong-meta'), wrongRegion: $('#wrong-region'), correctLabel: $('#correct-label'),
-        correctSample: $('#correct-sample'), correctMeta: $('#correct-meta'), correctRegion: $('#correct-region'), next: $('#next'),
+        detail: $('#detail'), detailHint: $('#detail-hint'), detailRegion: $('#detail-region'), comparison: $('#comparison'), wrongLabel: $('#wrong-label'),
+        wrongSample: $('#wrong-sample'), wrongMeta: $('#wrong-meta'), wrongHint: $('#wrong-hint'), wrongRegion: $('#wrong-region'), correctLabel: $('#correct-label'),
+        correctSample: $('#correct-sample'), correctMeta: $('#correct-meta'), correctHint: $('#correct-hint'), correctRegion: $('#correct-region'), next: $('#next'),
         reset: $('#reset'), score: $('#score'), answered: $('#answered'), progress: $('#progress'),
         quizView: $('#quiz-view'), scorePanel: $('#score-panel'), reference: $('#reference'),
         referenceToggle: $('#reference-toggle'), scriptList: $('#script-list')
@@ -375,6 +378,7 @@
         els.result.hidden = true;
         els.comparison.hidden = true;
         els.detail.hidden = false;
+        els.detailHint.hidden = false;
         els.detailRegion.hidden = false;
         els.next.disabled = true;
         els.answers.replaceChildren();
@@ -409,20 +413,24 @@
 
         els.verdict.textContent = isCorrect ? '正解' : `不正解 — 正解は「${current.script}」`;
         els.verdict.className = `verdict ${isCorrect ? 'good' : 'bad'}`;
-        els.detail.textContent = `${current.language}の例文。判別ポイント：${current.hint}`;
+        els.detail.textContent = `${current.language}の例文。`;
+        els.detailHint.textContent = `判別ポイント：${current.hint}`;
         els.detailRegion.textContent = `使用地域：${current.region}`;
 
         els.comparison.hidden = isCorrect;
         if (!isCorrect) {
           els.detail.hidden = true;
+          els.detailHint.hidden = true;
           els.detailRegion.hidden = true;
           els.wrongLabel.textContent = selected.script;
           els.wrongSample.textContent = pickText(selected);
-          els.wrongMeta.textContent = `${selected.language}。判別ポイント：${selected.hint}`;
+          els.wrongMeta.textContent = `${selected.language}。`;
+          els.wrongHint.textContent = `判別ポイント：${selected.hint}`;
           els.wrongRegion.textContent = `使用地域：${selected.region}`;
           els.correctLabel.textContent = current.script;
           els.correctSample.textContent = currentText;
-          els.correctMeta.textContent = `${current.language}。判別ポイント：${current.hint}`;
+          els.correctMeta.textContent = `${current.language}。`;
+          els.correctHint.textContent = `判別ポイント：${current.hint}`;
           els.correctRegion.textContent = `使用地域：${current.region}`;
           els.comparison.hidden = false;
         }
