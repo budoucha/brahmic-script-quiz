@@ -141,6 +141,7 @@
     .verdict.good { color: var(--good); }
     .verdict.bad { color: var(--bad); }
     .detail { margin: 7px 0 0; color: var(--muted); line-height: 1.65; }
+    .detail-region { margin: 5px 0 0; color: var(--muted); line-height: 1.65; }
 
     .comparison {
       display: grid;
@@ -221,20 +222,21 @@
       <section id="result" class="card result" aria-live="polite" hidden>
         <h2 id="verdict" class="verdict"></h2>
         <p id="detail" class="detail"></p>
+        <p id="detail-region" class="detail-region"></p>
         <div id="comparison" class="comparison" hidden>
           <article class="compare-card">
             <div class="compare-role">選んだ文字の例</div>
             <div id="wrong-label" class="compare-label"></div>
             <div id="wrong-sample" class="compare-text"></div>
-            <div id="wrong-meta" class="compare-meta"></div>
-            <div id="wrong-region" class="compare-region"></div>
+            <p id="wrong-meta" class="compare-meta"></p>
+            <p id="wrong-region" class="compare-region"></p>
           </article>
           <article class="compare-card correct-side">
             <div class="compare-role">正解の文字</div>
             <div id="correct-label" class="compare-label"></div>
             <div id="correct-sample" class="compare-text"></div>
-            <div id="correct-meta" class="compare-meta"></div>
-            <div id="correct-region" class="compare-region"></div>
+            <p id="correct-meta" class="compare-meta"></p>
+            <p id="correct-region" class="compare-region"></p>
           </article>
         </div>
       </section>
@@ -317,7 +319,7 @@
       const $ = (selector) => document.querySelector(selector);
       const els = {
         sample: $('#sample'), answers: $('#answers'), result: $('#result'), verdict: $('#verdict'),
-        detail: $('#detail'), comparison: $('#comparison'), wrongLabel: $('#wrong-label'),
+        detail: $('#detail'), detailRegion: $('#detail-region'), comparison: $('#comparison'), wrongLabel: $('#wrong-label'),
         wrongSample: $('#wrong-sample'), wrongMeta: $('#wrong-meta'), wrongRegion: $('#wrong-region'), correctLabel: $('#correct-label'),
         correctSample: $('#correct-sample'), correctMeta: $('#correct-meta'), correctRegion: $('#correct-region'), next: $('#next'),
         reset: $('#reset'), score: $('#score'), answered: $('#answered'), progress: $('#progress'),
@@ -372,6 +374,8 @@
         els.progress.textContent = `第 ${answered + 1} 問`;
         els.result.hidden = true;
         els.comparison.hidden = true;
+        els.detail.hidden = false;
+        els.detailRegion.hidden = false;
         els.next.disabled = true;
         els.answers.replaceChildren();
 
@@ -405,10 +409,13 @@
 
         els.verdict.textContent = isCorrect ? '正解' : `不正解 — 正解は「${current.script}」`;
         els.verdict.className = `verdict ${isCorrect ? 'good' : 'bad'}`;
-        els.detail.textContent = `${current.language}の例文。判別ポイント：${current.hint} 使用地域：${current.region}`;
+        els.detail.textContent = `${current.language}の例文。判別ポイント：${current.hint}`;
+        els.detailRegion.textContent = `使用地域：${current.region}`;
 
         els.comparison.hidden = isCorrect;
         if (!isCorrect) {
+          els.detail.hidden = true;
+          els.detailRegion.hidden = true;
           els.wrongLabel.textContent = selected.script;
           els.wrongSample.textContent = pickText(selected);
           els.wrongMeta.textContent = `${selected.language}。判別ポイント：${selected.hint}`;
