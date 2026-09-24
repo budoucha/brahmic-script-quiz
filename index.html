@@ -156,6 +156,7 @@
     .compare-label { margin-top: 4px; font-weight: 700; }
     .compare-text { margin-top: 12px; min-height: 4.5em; font-size: clamp(1.25rem, 3vw, 1.7rem); line-height: 1.5; overflow-wrap: anywhere; }
     .compare-meta { margin-top: 10px; color: var(--muted); font-size: .78rem; line-height: 1.5; }
+    .compare-region { margin-top: 7px; color: var(--muted); font-size: .78rem; line-height: 1.5; }
 
     .controls { display: flex; justify-content: space-between; gap: 10px; margin-top: 14px; }
     .action { min-height: 46px; padding: 9px 17px; }
@@ -173,6 +174,7 @@
     .script-language { margin: 4px 0 0; color: var(--muted); font-size: .82rem; }
     .script-sample { margin: 13px 0 0; min-height: 3em; font-family: "Noto Sans", "Nirmala UI", "Leelawadee UI", sans-serif; font-size: clamp(1.2rem, 3vw, 1.6rem); line-height: 1.5; overflow-wrap: anywhere; }
     .script-hint { margin: 10px 0 0; color: var(--muted); font-size: .82rem; line-height: 1.55; }
+    .script-region { margin: 7px 0 0; color: var(--muted); font-size: .82rem; line-height: 1.55; }
 
     .site-footer { margin-top: 22px; text-align: center; font-size: .78rem; }
     .site-footer a { color: var(--muted); text-decoration: none; }
@@ -225,12 +227,14 @@
             <div id="wrong-label" class="compare-label"></div>
             <div id="wrong-sample" class="compare-text"></div>
             <div id="wrong-meta" class="compare-meta"></div>
+            <div id="wrong-region" class="compare-region"></div>
           </article>
           <article class="compare-card correct-side">
             <div class="compare-role">正解の文字</div>
             <div id="correct-label" class="compare-label"></div>
             <div id="correct-sample" class="compare-text"></div>
             <div id="correct-meta" class="compare-meta"></div>
+            <div id="correct-region" class="compare-region"></div>
           </article>
         </div>
       </section>
@@ -257,55 +261,55 @@
       'use strict';
 
       const data = [
-        { script: 'デーヴァナーガリー', language: 'ヒンディー語', hint: '上部を横線でつないだ「屋根」が非常に目立つ。', texts: [
+        { script: 'デーヴァナーガリー', language: 'ヒンディー語', hint: '上部を横線でつないだ「屋根」が非常に目立つ。', region: 'インド北部・中部、ネパール全域', texts: [
           'आज मौसम अच्छा है।', 'मैं एक किताब पढ़ रहा हूँ।', 'यह शहर बहुत बड़ा है।', 'पानी बहुत ठंडा है।', 'हम कल बाजार जाएंगे।'
         ]},
-        { script: 'ベンガル文字', language: 'ベンガル語', hint: '上線を持つが、デーヴァナーガリーより丸く、垂れ下がる形が多い。', texts: [
+        { script: 'ベンガル文字', language: 'ベンガル語', hint: '上線を持つが、デーヴァナーガリーより丸く、垂れ下がる形が多い。', region: 'バングラデシュ全域、インド東部・西ベンガル州（コルカタ周辺）', texts: [
           'আজ আবহাওয়া ভালো।', 'আমি একটি বই পড়ছি।', 'এই শহরটি খুব বড়।', 'পানি খুব ঠান্ডা।', 'আমরা কাল বাজারে যাব।'
         ]},
-        { script: 'グルムキー文字', language: 'パンジャーブ語', hint: '上線があり、比較的直線的で簡潔な字形が多い。', texts: [
+        { script: 'グルムキー文字', language: 'パンジャーブ語', hint: '上線があり、比較的直線的で簡潔な字形が多い。', region: 'インド北西部・パンジャーブ州（チャンディーガル周辺）', texts: [
           'ਅੱਜ ਮੌਸਮ ਚੰਗਾ ਹੈ।', 'ਮੈਂ ਇੱਕ ਕਿਤਾਬ ਪੜ੍ਹ ਰਿਹਾ ਹਾਂ।', 'ਇਹ ਸ਼ਹਿਰ ਬਹੁਤ ਵੱਡਾ ਹੈ।', 'ਪਾਣੀ ਬਹੁਤ ਠੰਢਾ ਹੈ।', 'ਅਸੀਂ ਕੱਲ੍ਹ ਬਾਜ਼ਾਰ ਜਾਵਾਂਗੇ।'
         ]},
-        { script: 'グジャラート文字', language: 'グジャラート語', hint: 'デーヴァナーガリーに近いが、上部の連続した横線がない。', texts: [
+        { script: 'グジャラート文字', language: 'グジャラート語', hint: 'デーヴァナーガリーに近いが、上部の連続した横線がない。', region: 'インド西部・グジャラート州（アフマダーバード周辺）', texts: [
           'આજે હવામાન સારું છે.', 'હું એક પુસ્તક વાંચું છું.', 'આ શહેર બહુ મોટું છે.', 'પાણી બહુ ઠંડું છે.', 'અમે કાલે બજારમાં જઈશું.'
         ]},
-        { script: 'オディア文字', language: 'オディア語', hint: '円・半円が非常に多く、丸い傘のような字形が特徴。', texts: [
+        { script: 'オディア文字', language: 'オディア語', hint: '円・半円が非常に多く、丸い傘のような字形が特徴。', region: 'インド東部・オディシャ州（ブバネーシュワル周辺）', texts: [
           'ଆଜି ପାଗ ଭଲ ଅଛି।', 'ମୁଁ ଗୋଟିଏ ବହି ପଢ଼ୁଛି।', 'ଏହି ସହର ବହୁତ ବଡ଼।', 'ପାଣି ବହୁତ ଥଣ୍ଡା।', 'ଆମେ କାଲି ବଜାରକୁ ଯିବୁ।'
         ]},
-        { script: 'タミル文字', language: 'タミル語', hint: '丸みが強い一方、テルグ・カンナダほど輪郭が複雑ではない。', texts: [
+        { script: 'タミル文字', language: 'タミル語', hint: '丸みが強い一方、テルグ・カンナダほど輪郭が複雑ではない。', region: 'インド南東部・タミル・ナードゥ州（チェンナイ周辺）、スリランカ北部・東部', texts: [
           'இன்று வானிலை நன்றாக உள்ளது.', 'நான் ஒரு புத்தகம் படிக்கிறேன்.', 'இந்த நகரம் மிகவும் பெரியது.', 'தண்ணீர் மிகவும் குளிராக உள்ளது.', 'நாங்கள் நாளை சந்தைக்கு செல்வோம்.'
         ]},
-        { script: 'テルグ文字', language: 'テルグ語', hint: '丸い字形と、上部の短い鉤やチェック状の線が頻出する。', texts: [
+        { script: 'テルグ文字', language: 'テルグ語', hint: '丸い字形と、上部の短い鉤やチェック状の線が頻出する。', region: 'インド中南部・テランガーナ州（ハイデラバード周辺）と南東部・アーンドラ・プラデーシュ州', texts: [
           'ఈ రోజు వాతావరణం బాగుంది.', 'నేను ఒక పుస్తకం చదువుతున్నాను.', 'ఈ నగరం చాలా పెద్దది.', 'నీరు చాలా చల్లగా ఉంది.', 'మేము రేపు మార్కెట్‌కు వెళ్తాము.'
         ]},
-        { script: 'カンナダ文字', language: 'カンナダ語', hint: 'テルグ文字と近縁。丸い本体に角張った小要素が混じる。', texts: [
+        { script: 'カンナダ文字', language: 'カンナダ語', hint: 'テルグ文字と近縁。丸い本体に角張った小要素が混じる。', region: 'インド南西部・カルナータカ州（ベンガルール周辺）', texts: [
           'ಇಂದು ಹವಾಮಾನ ಚೆನ್ನಾಗಿದೆ.', 'ನಾನು ಒಂದು ಪುಸ್ತಕ ಓದುತ್ತಿದ್ದೇನೆ.', 'ಈ ನಗರ ತುಂಬಾ ದೊಡ್ಡದು.', 'ನೀರು ತುಂಬಾ ತಣ್ಣಗಿದೆ.', 'ನಾವು ನಾಳೆ ಮಾರುಕಟ್ಟೆಗೆ ಹೋಗುತ್ತೇವೆ.'
         ]},
-        { script: 'マラヤーラム文字', language: 'マラヤーラム語', hint: '極端に丸く、連続するループや円弧が多い。', texts: [
+        { script: 'マラヤーラム文字', language: 'マラヤーラム語', hint: '極端に丸く、連続するループや円弧が多い。', region: 'インド南西沿岸部・ケーララ州（コーチ周辺）', texts: [
           'ഇന്ന് കാലാവസ്ഥ നല്ലതാണ്.', 'ഞാൻ ഒരു പുസ്തകം വായിക്കുന്നു.', 'ഈ നഗരം വളരെ വലുതാണ്.', 'വെള്ളം വളരെ തണുത്തതാണ്.', 'ഞങ്ങൾ നാളെ ചന്തയിലേക്ക് പോകും.'
         ]},
-        { script: 'シンハラ文字', language: 'シンハラ語', hint: '丸い渦巻きや輪のような字形が多く、南インド系とも輪郭が異なる。', texts: [
+        { script: 'シンハラ文字', language: 'シンハラ語', hint: '丸い渦巻きや輪のような字形が多く、南インド系とも輪郭が異なる。', region: 'スリランカの大部分（北部・東部のタミル語地域を除く）', texts: [
           'අද කාලගුණය හොඳයි.', 'මම පොතක් කියවනවා.', 'මේ නගරය ඉතා විශාලයි.', 'වතුර සීතලයි.', 'අපි හෙට වෙළඳපොළට යනවා.'
         ]},
-        { script: 'タイ文字', language: 'タイ語', hint: '小さな輪を伴う字が多く、母音記号や声調記号が上下に飛び出す。', texts: [
+        { script: 'タイ文字', language: 'タイ語', hint: '小さな輪を伴う字が多く、母音記号や声調記号が上下に飛び出す。', region: 'タイ全域', texts: [
           'วันนี้อากาศดีมาก', 'ฉันกำลังอ่านหนังสือ', 'เมืองนี้ใหญ่มาก', 'น้ำเย็นมาก', 'พรุ่งนี้เราจะไปตลาด'
         ]},
-        { script: 'ラオ文字', language: 'ラオ語', hint: 'タイ文字に似るが、全体にさらに丸く簡略化された印象。', texts: [
+        { script: 'ラオ文字', language: 'ラオ語', hint: 'タイ文字に似るが、全体にさらに丸く簡略化された印象。', region: 'ラオス全域', texts: [
           'ມື້ນີ້ອາກາດດີຫຼາຍ', 'ຂ້ອຍກຳລັງອ່ານປຶ້ມ', 'ເມືອງນີ້ໃຫຍ່ຫຼາຍ', 'ນ້ຳເຢັນຫຼາຍ', 'ມື້ອື່ນພວກເຮົາຈະໄປຕະຫຼາດ'
         ]},
-        { script: 'クメール文字', language: 'クメール語', hint: '横方向に複雑で、上下の細かな突起が多く密度が高い。', texts: [
+        { script: 'クメール文字', language: 'クメール語', hint: '横方向に複雑で、上下の細かな突起が多く密度が高い。', region: 'カンボジア全域', texts: [
           'ថ្ងៃនេះអាកាសធាតុល្អណាស់។', 'ខ្ញុំកំពុងអានសៀវភៅ។', 'ទីក្រុងនេះធំណាស់។', 'ទឹកត្រជាក់ណាស់។', 'ថ្ងៃស្អែកយើងនឹងទៅផ្សារ។'
         ]},
-        { script: 'ビルマ文字', language: 'ビルマ語', hint: 'ほぼ円・半円だけで書いたような独特の丸さがある。', texts: [
+        { script: 'ビルマ文字', language: 'ビルマ語', hint: 'ほぼ円・半円だけで書いたような独特の丸さがある。', region: 'ミャンマーの大部分（ヤンゴン・マンダレー周辺など）', texts: [
           'ဒီနေ့ ရာသီဥတု ကောင်းတယ်။', 'ကျွန်တော် စာအုပ်ဖတ်နေတယ်။', 'ဒီမြို့က အရမ်းကြီးတယ်။', 'ရေက အရမ်းအေးတယ်။', 'မနက်ဖြန် ကျွန်တော်တို့ ဈေးသွားမယ်။'
         ]},
-        { script: 'チベット文字', language: 'チベット語', hint: '上部が水平で角張り、音節区切りの小点「་」が頻出する。', texts: [
+        { script: 'チベット文字', language: 'チベット語', hint: '上部が水平で角張り、音節区切りの小点「་」が頻出する。', region: '中国南西部・チベット自治区（ラサ周辺）、インド北部・ラダック地方、ネパール北部', texts: [
           'དེ་རིང་གནམ་གཤིས་བཟང་།', 'ང་དཔེ་ཆ་ཀློག་བཞིན་ཡོད།', 'གྲོང་ཁྱེར་འདི་ཧ་ཅང་ཆེ།', 'ཆུ་གྲང་མོ་རེད།', 'སང་ཉིན་ང་ཚོ་ཁྲོམ་ལ་འགྲོ་རྒྱུ་ཡིན།'
         ]},
-        { script: 'ジャワ文字', language: 'ジャワ語', hint: '細長い曲線と、ぶら下がるような記号が連なる。', texts: [
+        { script: 'ジャワ文字', language: 'ジャワ語', hint: '細長い曲線と、ぶら下がるような記号が連なる。', region: 'インドネシア中部・東部ジャワ島（ジョグジャカルタ、スラカルタ周辺の公共・文化施設）', texts: [
           'ꦲꦏꦸꦩꦕꦧꦸꦏꦸ꧉', 'ꦲꦶꦏꦶꦏꦸꦛꦒꦼꦝꦺ꧉', 'ꦧꦚꦸꦲꦶꦏꦶꦲꦢꦼꦩ꧀꧉', 'ꦢꦶꦤꦲꦶꦏꦶꦕꦼꦫꦃ꧉', 'ꦲꦺꦱꦸꦏ꧀ꦲꦏꦸꦩꦼꦚꦁꦥꦱꦂ꧉'
         ]},
-        { script: 'バリ文字', language: 'バリ語', hint: 'ジャワ文字に似るが、より装飾的で細かな曲線が多い。', texts: [
+        { script: 'バリ文字', language: 'バリ語', hint: 'ジャワ文字に似るが、より装飾的で細かな曲線が多い。', region: 'インドネシア・バリ島全域（デンパサール周辺など）', texts: [
           'ᬑᬁ ᬲ᭄ᬯᬲ᭄ᬢᬶᬬᬲ᭄ᬢᬸ᭟', 'ᬭᬳᬚᭂᬂ ᬲᭂᬫᭂᬂ᭟', 'ᬭᬳᬚᭂᬂ ᬲᬶᬅᬂ᭟', 'ᬭᬳᬚᭂᬂ ᬲᭀᬭᬾ᭟', 'ᬭᬳᬚᭂᬂ ᬯᭂᬗᬶ᭟'
         ]}
       ];
@@ -314,8 +318,8 @@
       const els = {
         sample: $('#sample'), answers: $('#answers'), result: $('#result'), verdict: $('#verdict'),
         detail: $('#detail'), comparison: $('#comparison'), wrongLabel: $('#wrong-label'),
-        wrongSample: $('#wrong-sample'), wrongMeta: $('#wrong-meta'), correctLabel: $('#correct-label'),
-        correctSample: $('#correct-sample'), correctMeta: $('#correct-meta'), next: $('#next'),
+        wrongSample: $('#wrong-sample'), wrongMeta: $('#wrong-meta'), wrongRegion: $('#wrong-region'), correctLabel: $('#correct-label'),
+        correctSample: $('#correct-sample'), correctMeta: $('#correct-meta'), correctRegion: $('#correct-region'), next: $('#next'),
         reset: $('#reset'), score: $('#score'), answered: $('#answered'), progress: $('#progress'),
         quizView: $('#quiz-view'), scorePanel: $('#score-panel'), reference: $('#reference'),
         referenceToggle: $('#reference-toggle'), scriptList: $('#script-list')
@@ -401,16 +405,18 @@
 
         els.verdict.textContent = isCorrect ? '正解' : `不正解 — 正解は「${current.script}」`;
         els.verdict.className = `verdict ${isCorrect ? 'good' : 'bad'}`;
-        els.detail.textContent = `${current.language}の例文。判別ポイント：${current.hint}`;
+        els.detail.textContent = `${current.language}の例文。判別ポイント：${current.hint} 使用地域：${current.region}`;
 
         els.comparison.hidden = isCorrect;
         if (!isCorrect) {
           els.wrongLabel.textContent = selected.script;
           els.wrongSample.textContent = pickText(selected);
           els.wrongMeta.textContent = `${selected.language}。判別ポイント：${selected.hint}`;
+          els.wrongRegion.textContent = `使用地域：${selected.region}`;
           els.correctLabel.textContent = current.script;
           els.correctSample.textContent = currentText;
           els.correctMeta.textContent = `${current.language}。判別ポイント：${current.hint}`;
+          els.correctRegion.textContent = `使用地域：${current.region}`;
           els.comparison.hidden = false;
         }
 
@@ -451,7 +457,11 @@
           hint.className = 'script-hint';
           hint.textContent = `判別ポイント：${item.hint}`;
 
-          card.append(name, language, sample, hint);
+          const region = document.createElement('p');
+          region.className = 'script-region';
+          region.textContent = `使用地域：${item.region}`;
+
+          card.append(name, language, sample, hint, region);
           return card;
         });
         els.scriptList.replaceChildren(...cards);
