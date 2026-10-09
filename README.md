@@ -11,7 +11,9 @@
 - タイ文字、ラオ文字、クメール文字、ビルマ文字、チベット文字
 - ジャワ文字、バリ文字
 
-各文字体系に5文を収録し、出題ごとにランダム表示する。不正解時には、選んだ文字と正解の文字の例文・判別ポイントを並べて比較できる。
+各文字体系に10例、計170例を収録し、出題ごとにランダム表示する。日常生活・食事・学校・自然・道案内の短文や、挨拶・感謝などの表現を含む。不正解時には、選んだ文字と正解の文字の例文・判別ポイントを並べて比較できる。
+
+ジャワ文字の追加例は [Tata Tulis Aksara Jawa](https://storage.jogjabelajar.org/assets/content/nugroho-saputra-167627-0708.pdf)、バリ文字の追加例は [Omniglot のバリ語表現集](https://www.omniglot.com/language/phrases/balinese.htm) と [ICANN のバリ文字資料](https://www.icann.org/en/system/files/files/proposal-balinese-second-level-12sep24-en.pdf) を表記の参考にした。
 
 ## 使い方
 
